@@ -1,3 +1,4 @@
+from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
@@ -41,6 +42,16 @@ class UrbanRoutesPage:
     CARD_NUMBER_FIELD = (By.ID, "number")
     CARD_CVV_FIELD = (By.CSS_SELECTOR, "input.card-input#code")
     SAVE_CARD_BUTTON = (By.XPATH, "//button[normalize-space()='Adicionar']")
+    CURRENT_PAYMENT_METHOD = (
+        By.XPATH,
+        "//div[contains(@class, 'pp-value-text')]"
+    )
+
+    # Localizador do telefone confirmado.
+    REGISTERED_PHONE_NUMBER = (
+        By.XPATH,
+        "//div[contains(@class, 'np-text')]"
+    )
 
     # Localizador do comentário.
     COMMENT_FIELD = (By.ID, "comment")
@@ -94,6 +105,12 @@ class UrbanRoutesPage:
             return False
 
         return self.wait.until(find_visible_element)
+
+    def _get_text(self, locator):
+        # Aguarda o elemento ficar visível e retorna o seu texto.
+        return self.wait.until(
+            EC.visibility_of_element_located(locator)
+        ).text
 
     def open(self, url):
         # Abre o Urban Routes.
@@ -213,6 +230,14 @@ class UrbanRoutesPage:
             EC.element_to_be_clickable(self.SAVE_CARD_BUTTON)
         ).click()
 
+    def get_current_payment_method(self):
+        # Retorna o texto da forma de pagamento selecionada.
+        return self._get_text(self.CURRENT_PAYMENT_METHOD)
+
+    def get_registered_phone_number(self):
+        # Retorna o número de telefone confirmado exibido na tela.
+        return self._get_text(self.REGISTERED_PHONE_NUMBER)
+
     def add_comment_for_driver(self, comment):
         # Escreve um comentário para o motorista.
         comment_field = self.wait.until(
@@ -220,6 +245,12 @@ class UrbanRoutesPage:
         )
         comment_field.clear()
         comment_field.send_keys(comment)
+
+    def get_driver_comment(self):
+        # Retorna o valor atual do campo de comentário.
+        return self.driver.find_element(
+            *self.COMMENT_FIELD
+        ).get_attribute("value")
 
     def open_requirements(self):
         # Abre a seção de requisitos apenas se ainda estiver fechada.
@@ -275,7 +306,7 @@ class UrbanRoutesPage:
 
         try:
             button.click()
-        except Exception:
+        except ElementClickInterceptedException:
             # Se algo ainda estiver sobrepondo o botão, clica via JavaScript.
             self.driver.execute_script("arguments[0].click();", button)
 
