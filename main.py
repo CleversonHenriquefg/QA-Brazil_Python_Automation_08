@@ -10,6 +10,12 @@ from pages import UrbanRoutesPage
 class TestUrbanRoutes:
     @classmethod
     def setup_class(cls):
+        # Verifica se o servidor Urban Routes está acessível
+        # antes de iniciar o navegador e os testes.
+        assert helpers.is_url_reachable(data.URBAN_ROUTES_URL), (
+            f"Servidor Urban Routes inacessível: {data.URBAN_ROUTES_URL}"
+        )
+
         # Habilita logs para recuperar o código SMS.
         options = webdriver.ChromeOptions()
         options.set_capability(
@@ -74,15 +80,21 @@ class TestUrbanRoutes:
         self.prepare_comfort_trip()
         self.confirm_phone_number()
 
+        assert self.page.get_registered_phone_number() == data.PHONE_NUMBER
+
     def test_fill_card(self):
         # Testa a adição do cartão.
         self.prepare_comfort_trip()
         self.add_payment_card()
 
+        assert self.page.get_current_payment_method() == "Cartão"
+
     def test_comment_for_driver(self):
         # Testa o comentário ao motorista.
         self.prepare_comfort_trip()
         self.page.add_comment_for_driver(data.MESSAGE_FOR_DRIVER)
+
+        assert self.page.get_driver_comment() == data.MESSAGE_FOR_DRIVER
 
     def test_order_blanket_and_handkerchiefs(self):
         # Testa a solicitação de cobertor e lenços.
