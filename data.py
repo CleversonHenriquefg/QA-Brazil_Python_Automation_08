@@ -1,6 +1,6 @@
 # URL atual do servidor Urban Routes.
 URBAN_ROUTES_URL = (
-    "https://cnt-877a58c8-4f6b-4547-89e3-1de174128f41.containerhub.tripleten-services.com/?lng=pt"
+    "https://cnt-1a465885-fb91-493f-8238-e341b222c518.containerhub.tripleten-services.com/?lng=pt"
 )
 
 # Dados usados nos testes.
